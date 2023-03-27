@@ -18,6 +18,7 @@ specifiers:
   autoprefixer: ^10.4.7
   eslint: ^8.34.0
   eslint-config-next: ^13.2.1
+  houseform: ^1.9.0
   next: ^13.2.1
   nextjs-cors: ^2.1.2
   postcss: ^8.4.14
@@ -42,6 +43,7 @@ dependencies:
   '@trpc/next': 10.18.0_fk7ybuwqrs7skzzxcj6wjc5c3i
   '@trpc/react-query': 10.18.0_rcvfzig2xktluz4p7kugxqlbwi
   '@trpc/server': 10.18.0
+  houseform: 1.9.0_react@18.2.0+zod@3.21.4
   next: 13.2.4_biqbaboplfbrettd7655fr4n2y
   nextjs-cors: 2.1.2_next@13.2.4
   react: 18.2.0
@@ -2678,6 +2680,16 @@ packages:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
     dependencies:
       react-is: 16.13.1
+    dev: false
+
+  /houseform/1.9.0_react@18.2.0+zod@3.21.4:
+    resolution: {integrity: sha512-NKiqdSrKKXGoKnudKXdkzDP2BDn+cDCmXfA2a1nV3A3RhzmIlfmJfqlJe1CNBMgNBvLhLKDv8g8Lyx8xketmUg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      zod: '>=3.9.0'
+    dependencies:
+      react: 18.2.0
+      zod: 3.21.4
     dev: false
 
   /http-errors/2.0.0:
