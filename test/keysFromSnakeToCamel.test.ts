@@ -57,4 +57,41 @@ describe("keysFromSnakeToCamel", () => {
     const result = keysFromSnakeToCamel(obj);
     expect(result).toEqual(expected);
   });
+
+  it("should handle arrays of objects", () => {
+    const obj = {
+      users: [
+        {
+          seat_type_id: 1,
+          name: "Primera clase",
+        },
+        {
+          seat_type_id: 2,
+          name: "Clase económica premium",
+        },
+        {
+          seat_type_id: 3,
+          name: "Clase económica",
+        },
+      ],
+    };
+    const expected = {
+      users: [
+        {
+          seatTypeId: 1,
+          name: "Primera clase",
+        },
+        {
+          seatTypeId: 2,
+          name: "Clase económica premium",
+        },
+        {
+          seatTypeId: 3,
+          name: "Clase económica",
+        },
+      ],
+    };
+    const result = keysFromSnakeToCamel(obj);
+    expect(result).toEqual(expected);
+  });
 });
