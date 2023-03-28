@@ -25,7 +25,7 @@ const simulationOutputSchema = z.object({
               boardingPassId: z.number(),
               purchaseId: z.number(),
               seatTypeId: z.number(),
-              seatId: z.number(),
+              seatId: z.number().nullish(),
             })
             .optional()
         )
@@ -69,22 +69,32 @@ export const simulationRouter = createTRPCRouter({
           (boardingPass) => boardingPass.passenger_id
         );
 
-        const passengersBasicInfo = await ctx.prisma.passenger.findMany({
+        const passengers = await ctx.prisma.passenger.findMany({
           where: {
             passenger_id: { in: selectedFlightPassengersIds },
           },
         });
 
-        const passengersFullInfo = passengersBasicInfo.map((passenger) => ({
-          ...passenger,
-          boardingPassId: 1,
-          purchaseId: 1,
-          seatTypeId: 1,
-          seatId: 1,
-        }));
+        const passengerFullData = selectedFlightPassengersIds.map(
+          (passengerId) => {
+            const passengerBasicData = passengers.find(
+              (passenger) => passenger.passenger_id === passengerId
+            )!;
+            const passengerBoardingPassData = boardingPassesByFlightId.find(
+              (boardingPass) => boardingPass.passenger_id === passengerId
+            )!;
+            return {
+              boarding_pass_id: passengerBoardingPassData?.boarding_pass_id,
+              purchase_id: passengerBoardingPassData?.purchase_id,
+              seat_type_id: passengerBoardingPassData?.seat_type_id,
+              seat_id: passengerBoardingPassData?.seat_id,
+              ...passengerBasicData,
+            };
+          }
+        );
 
         const checkInSimulation = keysFromSnakeToCamel({
-          passengers: passengersFullInfo,
+          passengers: passengerFullData,
           ...selectedFlight,
         });
 
