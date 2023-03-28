@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { keysFromSnakeToCamel } from "~/utils/keysFromSnakeToCamel";
+import keysFromSnakeToCamel from "~/utils/keysFromSnakeToCamel";
 
 describe("keysFromSnakeToCamel", () => {
   it("should convert all keys from snake_case to camelCase recursively", () => {
@@ -11,10 +11,19 @@ describe("keysFromSnakeToCamel", () => {
       landing_date_time: 1688221980,
       landing_airport: "Aeropuerto Internacional Jorge Cháve, Perú",
       airplane_id: 1,
-      address: {
-        street_name: "Main St",
-        postal_code: 12345,
-      },
+      passengers: [
+        {
+          passenger_id: 90,
+          dni: 983834822,
+          name: "Marisol",
+          age: 44,
+          country: "México",
+          boarding_pass_id: 24,
+          purchase_id: 47,
+          seat_type_id: 1,
+          seat_id: 1,
+        },
+      ],
     };
     const expected = {
       flightId: 1,
@@ -23,10 +32,19 @@ describe("keysFromSnakeToCamel", () => {
       landingDateTime: 1688221980,
       landingAirport: "Aeropuerto Internacional Jorge Cháve, Perú",
       airplaneId: 1,
-      address: {
-        streetName: "Main St",
-        postalCode: 12345,
-      },
+      passengers: [
+        {
+          passengerId: 90,
+          dni: 983834822,
+          name: "Marisol",
+          age: 44,
+          country: "México",
+          boardingPassId: 24,
+          purchaseId: 47,
+          seatTypeId: 1,
+          seatId: 1,
+        },
+      ],
     };
     const result = keysFromSnakeToCamel(obj);
     expect(result).toEqual(expected);
