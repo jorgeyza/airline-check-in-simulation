@@ -16,7 +16,7 @@ function Airplane() {
     flight_id: Number(flightId),
   });
 
-  const airplaneId = oneFlight.data?.data?.airplane_id;
+  const airplaneId = oneFlight.data?.data?.airplaneId;
 
   const {
     data: allSeatsByAirplaneId,
