@@ -1,17 +1,35 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import keysFromSnakeToCamel from "~/utils/keysFromSnakeToCamel";
 
 const simulationOutputSchema = z.object({
   code: z.number(),
   data: z
     .object({
-      flight_id: z.number().optional(),
-      takeoff_date_time: z.number().optional(),
-      takeoff_airport: z.string().optional(),
-      landing_date_time: z.number().optional(),
-      landing_airport: z.string().optional(),
-      airplane_id: z.number().optional(),
+      flightId: z.number().optional(),
+      takeoffDateTime: z.number().optional(),
+      takeoffAirport: z.string().optional(),
+      landingDateTime: z.number().optional(),
+      landingAirport: z.string().optional(),
+      airplaneId: z.number().optional(),
+      passengers: z
+        .array(
+          z
+            .object({
+              passengerId: z.number(),
+              dni: z.string(),
+              name: z.string(),
+              age: z.number(),
+              country: z.string(),
+              boardingPassId: z.number(),
+              purchaseId: z.number(),
+              seatTypeId: z.number(),
+              seatId: z.number(),
+            })
+            .optional()
+        )
+        .optional(),
     })
     .optional(),
   errors: z.string().optional(),
@@ -30,19 +48,49 @@ export const simulationRouter = createTRPCRouter({
     .output(simulationOutputSchema)
     .query(async ({ ctx, input }) => {
       try {
-        const flight = await ctx.prisma.flight.findFirst({
+        const selectedFlight = await ctx.prisma.flight.findFirst({
           where: { flight_id: input.flight_id },
         });
-        if (!flight) {
+        if (!selectedFlight) {
           return {
             code: 404,
             data: {},
           };
         }
 
+        const boardingPassesByFlightId =
+          await ctx.prisma.boarding_pass.findMany({
+            where: {
+              flight_id: input.flight_id,
+            },
+          });
+
+        const selectedFlightPassengersIds = boardingPassesByFlightId.map(
+          (boardingPass) => boardingPass.passenger_id
+        );
+
+        const passengersBasicInfo = await ctx.prisma.passenger.findMany({
+          where: {
+            passenger_id: { in: selectedFlightPassengersIds },
+          },
+        });
+
+        const passengersFullInfo = passengersBasicInfo.map((passenger) => ({
+          ...passenger,
+          boardingPassId: 1,
+          purchaseId: 1,
+          seatTypeId: 1,
+          seatId: 1,
+        }));
+
+        const checkInSimulation = keysFromSnakeToCamel({
+          passengers: passengersFullInfo,
+          ...selectedFlight,
+        });
+
         return {
           code: 200,
-          data: flight,
+          data: checkInSimulation,
         };
       } catch (error) {
         return {
@@ -52,46 +100,3 @@ export const simulationRouter = createTRPCRouter({
       }
     }),
 });
-
-/*
-```
-{
-  "code": 200,
-  "data": {
-  "flightId": 1,
-  "takeoffDateTime": 1688207580,
-  "takeoffAirport": "Aeropuerto Internacional Arturo Merino Benitez, Chile",
-  "landingDateTime": 1688221980,
-  "landingAirport": "Aeropuerto Internacional Jorge Cháve, Perú",
-  "airplaneId": 1,
-  "passengers": [
-  {
-  "passengerId": 90,
-  "dni": 983834822,
-  "name": "Marisol",
-  "age": 44,
-  "country": "México",
-  "boardingPassId": 24,
-  "purchaseId": 47,
-  "seatTypeId": 1,
-  "seatId": 1
-  },
-  {...}
-  ]
-  }
-}
-```
-
-```
-{
-  "code": 404,
-  "data": {}
-}
-```
-
-```
-{
-    "code": 400,
-    "errors": "could not connect to db"
-}
-```*/
