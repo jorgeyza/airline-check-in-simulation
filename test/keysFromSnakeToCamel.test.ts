@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import keysFromSnakeToCamel from "~/utils/keysFromSnakeToCamel";
+import { keysFromSnakeToCamel } from "~/utils/keysFromSnakeToCamel";
 
 describe("keysFromSnakeToCamel", () => {
   it("should convert all keys from snake_case to camelCase recursively", () => {

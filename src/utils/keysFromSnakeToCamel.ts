@@ -32,7 +32,7 @@ function walk(obj: unknown): unknown {
   );
 }
 
-export default function camelize<T>(
+export function keysFromSnakeToCamel<T>(
   obj: T
 ): T extends string ? string : Camelize<T> {
   const result = typeof obj === "string" ? camelCase(obj) : walk(obj);
