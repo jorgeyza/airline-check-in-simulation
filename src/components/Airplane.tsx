@@ -12,11 +12,11 @@ interface FormType {
 function Airplane() {
   const [flightId, setFlightId] = useState("");
 
-  const oneFlight = api.simulation.getSimulation.useQuery({
+  const { data: selectedFlight } = api.simulation.getSimulation.useQuery({
     flight_id: Number(flightId),
   });
 
-  const airplaneId = oneFlight.data?.data?.airplaneId;
+  const airplaneId = selectedFlight?.data?.airplaneId;
 
   const {
     data: allSeatsByAirplaneId,
@@ -47,10 +47,28 @@ function Airplane() {
     [allSeatsByAirplaneId]
   );
 
+  const allPassengers = useMemo(
+    () => selectedFlight?.data?.passengers,
+    [selectedFlight?.data?.passengers]
+  );
+
+  const seatsWithPassengerInfo = useMemo(() => {
+    const seatsAndPassengers = [];
+    for (const seat of allSeats) {
+      seatsAndPassengers.push({
+        ...seat,
+        passenger: allPassengers?.find(
+          (passenger) => passenger?.seatId === seat.seat_id
+        ),
+      });
+    }
+    return seatsAndPassengers;
+  }, [allPassengers, allSeats]);
+
   const seatColorVariants: { [key: number]: string } = {
-    1: "h-6 w-6 border-2 border-gray-400 bg-blue-500",
-    2: "h-6 w-6 border-2 border-gray-400 bg-orange-500",
-    3: "h-6 w-6 border-2 border-gray-400 bg-white",
+    1: "h-6 w-6 border-2 border-gray-400 bg-blue-500 text-slate-800 text-center",
+    2: "h-6 w-6 border-2 border-gray-400 bg-orange-500 text-slate-800 text-center",
+    3: "h-6 w-6 border-2 border-gray-400 bg-white text-slate-800 text-center",
   };
 
   function handleOnSubmit(values: FormType) {
@@ -134,15 +152,24 @@ function Airplane() {
             className="grid"
             style={{
               gridTemplateColumns: `repeat(${
-                flightId === "1" ? 7 : 9
+                airplaneId === 1 ? 7 : 9
               }, minmax(0, 24px))`,
               gridTemplateRows: `repeat(${
-                flightId === "1" ? 34 : 31
+                airplaneId === 1 ? 34 : 31
               }, minmax(0, 24px))`,
             }}
           >
-            {allSeats
-              ? allSeats.map((seat) => {
+            {seatsWithPassengerInfo
+              ? seatsWithPassengerInfo.map((seat) => {
+                  let childOrAdult = null;
+                  if (seat.passenger?.seatId && seat.passenger.age >= 18) {
+                    childOrAdult = "X";
+                  } else if (
+                    seat.passenger?.seatId &&
+                    seat.passenger.age < 18
+                  ) {
+                    childOrAdult = "o";
+                  }
                   return (
                     <div
                       key={seat.seat_id}
@@ -151,16 +178,13 @@ function Airplane() {
                         gridColumn: `${seat.seat_column} / span 1`,
                         gridRow: `${seat.seat_row} / span 1`,
                       }}
-                    />
+                    >
+                      {childOrAdult}
+                    </div>
                   );
                 })
               : "Loading tRPC query..."}
           </div>
-          <pre className="text-2xl text-white">
-            {allSeatsByAirplaneId
-              ? JSON.stringify(allSeatsByAirplaneId, null, 2)
-              : "Loading tRPC query..."}
-          </pre>
         </>
       )}
     </section>
