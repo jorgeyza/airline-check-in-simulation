@@ -26,6 +26,7 @@ You can see the [live application here](https://airline-check-in-simulation.verc
 
 - To call the API, make a GET request to `https://airline-check-in-simulation.vercel.app/api/flights/{flight_id}/passengers`.
 - There is a user interface at `https://airline-check-in-simulation.vercel.app/` which right now serves mostly for debugging purposes.
+- The API is documented at `https://airline-check-in-simulation.vercel.app/openapi`
 
 ## Envs
 
