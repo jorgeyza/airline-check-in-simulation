@@ -52,6 +52,25 @@ function Airplane() {
     [selectedFlight?.data?.passengers]
   );
 
+  const passengerSeatsIds = useMemo(
+    () => allPassengers?.map((passenger) => passenger?.seatId),
+    [allPassengers]
+  );
+
+  const repeatedPassengerSeatIds = passengerSeatsIds?.reduce<(number | null)[]>(
+    (repeatedIds, seatId, index, arr) => {
+      const firstIndex = arr.indexOf(seatId);
+      if (
+        firstIndex !== index &&
+        !repeatedIds.includes(seatId as number | null)
+      ) {
+        return [...repeatedIds, seatId as number | null];
+      }
+      return repeatedIds;
+    },
+    []
+  );
+
   const seatsWithPassengerInfo = useMemo(() => {
     const seatsAndPassengers = [];
     for (const seat of allSeats) {
@@ -185,6 +204,14 @@ function Airplane() {
                 })
               : "Loading tRPC query..."}
           </div>
+          <pre className="text-2xl text-white">
+            {repeatedPassengerSeatIds
+              ? JSON.stringify(repeatedPassengerSeatIds, null, 2)
+              : "Loading tRPC query"}
+            {seatsWithPassengerInfo
+              ? JSON.stringify(seatsWithPassengerInfo, null, 2)
+              : "Loading tRPC query..."}
+          </pre>
         </>
       )}
     </section>
